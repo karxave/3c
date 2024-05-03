@@ -7,6 +7,9 @@ public class InputManager : MonoBehaviour
 {
     public Action <Vector2> OnMoveInput; // sebuah Event, yaitu Event communication antara Class InputManager dengan Class PlayerMovement
 
+    public Action<bool> OnSprintInput;  // Event OnSprintAction , tipe Action dengan tipe Generic Bool
+
+    public Action OnJumpInput;  // untuk event type Action, karena tidak kirim data apapun jadi tidak pake Generic
 
     private void Update()
     {
@@ -114,11 +117,18 @@ public class InputManager : MonoBehaviour
 
         if (isHoldSprintInput)
         {
-            Debug.Log("Sprinting");
+            if (OnSprintInput != null)
+            {
+                OnSprintInput(true);
+            }
         }
         else
         {
-            Debug.Log("NOT Sprinting");
+            if (OnSprintInput != null)
+            {
+                OnSprintInput(false);
+            }
+
         }
     }
 
@@ -127,7 +137,10 @@ public class InputManager : MonoBehaviour
         bool isPressJumpInput = Input.GetKeyDown(KeyCode.Space);
         if (isPressJumpInput)
         {
-            Debug.Log("Jump");
+            if (OnJumpInput != null)
+            {
+                OnJumpInput();
+            }
         }
     }
 

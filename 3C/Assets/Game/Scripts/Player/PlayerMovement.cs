@@ -3,7 +3,16 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField]
-    private float _walkSpeed;
+    private float _walkSpeed;  // kecepatan Player saat walk
+
+    [SerializeField]
+    private float _sprintSpeed; // kecepatan Player saat sprint
+
+    private float _speed;   // current speed , akan dipakai untuk disesuaikan dengan _walkSpeed atau _sprintSpeed
+
+    [SerializeField]
+    private float _walkSprintTransition;
+
 
     [SerializeField]
     private InputManager _input;
@@ -15,20 +24,67 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody _rigidBody;
 
+    [SerializeField]
+    private Transform _groundDetector; // ini untuk menentukan posisi lower Step ( berguna untuk check isGrounded dan anak tangga)
+
+    [SerializeField]
+    private Vector3 _upperStepOffset; // ini untuk deteksi tinggi anak tangga, jadi posisi _upperStep anak tangga adalah penjumlahan lower step + offset
+
+    [SerializeField]
+    private float _stepCheckerDistance; // ini untuk hitung jarak maksimum dari detector ke step
+                                        // jika sudah melebihi jarak _stepCheckerDistance, maka step tidak akan terdeteksi
+                                        // detector hanya akan mendeteksi step dalam range _stepCheckterDistance        
+
+    [SerializeField]
+    private float _stepForce; // ini adalah besar daya mengangkat Player jika ada step ( anak tangga ) di depan Player
+
+    [SerializeField]
+    private float _jumpForce;
+
+    private bool _isGrounded;    // field yang menentukan apakah player di tanah atau tidak
+
+    [SerializeField]
+    private float _detectorRadius;
+
+    [SerializeField]
+    private LayerMask _groundLayer;
+
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();   // akses RigidBody via script di objek yang sama yaitu Player
+
+        _speed = _walkSpeed;        // speed awal saat start Game
+
+     
+
     }
 
 
     private void Start()
     {
-        _input.OnMoveInput += Move;   // PROCESS SUBSCRIBE
+        _input.OnMoveInput += Move;   // PROCESS SUBSCRIBE Move
+
+        _input.OnSprintInput += Sprint; // SUBSCRIBE Sprint
+
+        _input.OnJumpInput += Jump;
+
+
     }
+
+
 
     private void OnDestroy()
     {
-        _input.OnMoveInput -= Move; // PROCESS UNSUBSCRIBE
+        _input.OnMoveInput -= Move; // PROCESS UNSUBSCRIBE Move
+
+        _input.OnSprintInput -= Sprint; // UNSUBSCRIBE Sprint
+
+        _input.OnJumpInput -= Jump;
+    }
+
+    private void Update()
+    {
+        CheckIsGrounded();
     }
 
     // buat method Move untuk gerakin player
@@ -53,12 +109,61 @@ public class PlayerMovement : MonoBehaviour
 
             Vector3 movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
 
-            _rigidBody.AddForce(movementDirection * Time.deltaTime * _walkSpeed);                
+            // ganti _walkSpeed menjadi _speed
+            //_rigidBody.AddForce(movementDirection * _walkSpeed * Time.deltaTime);                
+            _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);                
         }
-            
     }
 
+    private void Jump()
+    {
+        if (_isGrounded)
+        {
+            Vector3 jumpDirection = Vector3.up; // new Vector3(0,1,0) = Vector3.up
+
+            _rigidBody.AddForce(jumpDirection * _jumpForce * Time.deltaTime);
+        }
+    }
     
+    private void CheckIsGrounded()
+    {
+        _isGrounded = Physics.CheckSphere(_groundDetector.position, _detectorRadius, _groundLayer);
+    }
+
+    private void CheckStep()
+    {
+        bool isHitLowerStep = Physics.Raycast(_groundDetector.position,
+                                                transform.forward,
+                                                _stepCheckerDistance);
+
+        bool isHitUpperStep = Physics.Raycast(_groundDetector.position +
+                                                _upperStepOffset,
+                                                transform.forward,
+                                                _stepCheckerDistance);
+
+        if (isHitLowerStep && !isHitUpperStep)
+        {
+            _rigidBody.AddForce(0, _stepForce, 0);
+        }
+    }
+
+    private void Sprint(bool isSprint)
+    {
+        if (isSprint)
+        {
+            if (_speed < _sprintSpeed)
+            {
+                _speed = _speed + _walkSprintTransition * Time.deltaTime;
+            }
+        }
+        else
+        {
+            if (_speed > _walkSpeed)
+            {
+                _speed = _speed - _walkSprintTransition * Time.deltaTime;
+            }
+        }
+    }
 
 }
 
