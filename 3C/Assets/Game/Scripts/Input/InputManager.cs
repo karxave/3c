@@ -11,6 +11,10 @@ public class InputManager : MonoBehaviour
 
     public Action OnJumpInput;  // untuk event type Action, karena tidak kirim data apapun jadi tidak pake Generic
 
+    public Action OnClimbInput;
+
+    public Action OnCancelClimb;
+
     private void Update()
     {
         CheckJumpInput();
@@ -66,7 +70,13 @@ public class InputManager : MonoBehaviour
 
         if (isPressCancelInput)
         {
-            Debug.Log("Cancel Climb or Cancel Glide");
+           if (isPressCancelInput)
+            {
+                if (OnCancelClimb != null)
+                {
+                    OnCancelClimb();
+                }
+            }
         }
     }
 
@@ -86,7 +96,7 @@ public class InputManager : MonoBehaviour
 
         if (isPressClimbInput)
         {
-            Debug.Log("Climb");
+            OnClimbInput();
         }
     }
 
