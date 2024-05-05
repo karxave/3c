@@ -141,7 +141,9 @@ public class PlayerMovement : MonoBehaviour
 
                 movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
 
-                _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);                
+                _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+
+              
             }
 
      }
@@ -154,6 +156,7 @@ public class PlayerMovement : MonoBehaviour
             movementDirection = horizontal + vertical;
 
             _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+
      }
 
     }
@@ -248,6 +251,17 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.black;
+        Gizmos.DrawRay(_climbDetector.position,transform.forward);
+    }
+
+//    private void OnCollisionExit(Collision collision)
+//    {
+//        _rigidBody.useGravity = true;   // butuh perbaikan , isTrigger = true, kalo udah climb malah jatuh lagi jadinya
+//    }
 
 }
 
