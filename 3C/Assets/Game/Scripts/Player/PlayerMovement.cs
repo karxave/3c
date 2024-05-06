@@ -67,6 +67,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float _climbSpeed;
 
+    [SerializeField]
+    private Transform _cameraTransform;
+
 
 
     private void Awake()
@@ -118,7 +121,7 @@ public class PlayerMovement : MonoBehaviour
     // method Move akan menerima data dari Class InputManager
     // jadi sediakan parameter dengan tipe Vector2 , namanya axisDirection
 
-    private void Move(Vector2 axisDirection) // method Move with isPlayerClimbing checking
+    private void Move(Vector2 axisDirection) // method Move with isPlayerClimbing checking  // lalu ditambah _cameraTransform.eulerAngles.y ke rotationAngle
     {
         // buat 2 variabel untuk check lagi berdiri atau lagi manjat 
         bool isPlayerStanding = _playerStance == PlayerStance.Stand;
@@ -133,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
      {
             if (axisDirection.magnitude >= 0.1) 
             {
-                float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg;
+                float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
                     
                 float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
 
