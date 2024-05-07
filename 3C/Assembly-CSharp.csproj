@@ -61,9 +61,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Game\Scripts\Player\PlayerStance.cs" />
+    <Compile Include="Assets\Game\Scripts\Camera\CameraState.cs" />
     <Compile Include="Assets\Game\Scripts\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Game\Scripts\Input\InputManager.cs" />
     <Compile Include="Assets\Config\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Game\Scripts\Camera\CameraManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

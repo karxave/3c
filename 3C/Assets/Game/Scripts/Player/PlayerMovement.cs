@@ -70,6 +70,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private Transform _cameraTransform;
 
+    [SerializeField]
+    private CameraManager _cameraManager;
+
 
 
     private void Awake()
@@ -117,41 +120,61 @@ public class PlayerMovement : MonoBehaviour
         CheckStep();
     }
 
-    // buat method Move untuk gerakin player
-    // method Move akan menerima data dari Class InputManager
-    // jadi sediakan parameter dengan tipe Vector2 , namanya axisDirection
+    private void Move(Vector2 axisDirection)   // sekarang buat camera , bikin dulu field _cameraManager utk direferensikan di Inspector
 
-    private void Move(Vector2 axisDirection) // method Move with isPlayerClimbing checking  // lalu ditambah _cameraTransform.eulerAngles.y ke rotationAngle
     {
-        // buat 2 variabel untuk check lagi berdiri atau lagi manjat 
         bool isPlayerStanding = _playerStance == PlayerStance.Stand;
         bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
 
         Vector3 movementDirection = Vector3.zero;
+                   
+        if (isPlayerStanding)
+        {
+            // tentukan terlebih dahulu apakah camera 1st person atau 3rd person
+            // pake switch
 
-
-        // lalu cek dulu lagi berdiri atau lagi manjat
-    
-     if (isPlayerStanding)
-     {
-            if (axisDirection.magnitude >= 0.1) 
+            switch(_cameraManager.CameraState)
             {
-                float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
-                    
-                float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
+                case CameraState.ThirdPerson:
 
-                transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
+                    if (axisDirection.magnitude >= 0.1)
+                    {
+                        float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
 
-                movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
+                        float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
 
-                _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+                        transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
 
-              
+                        movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
+
+                        _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+                    }
+
+                    break;
+                
+                case CameraState.FirstPerson:
+
+                    transform.rotation = Quaternion.Euler(0f, _cameraTransform.eulerAngles.y, 0f);
+
+                    Vector3 verticalDirection = axisDirection.y * transform.forward;
+
+                    Vector3 horizontalDirection = axisDirection.x * transform.right;
+
+                    movementDirection = verticalDirection + horizontalDirection;
+
+                    _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+
+                    break;
+                
+                default:
+                    break;
+
             }
 
-     }
-     else if (isPlayerClimbing)
-     {
+            
+        }
+        else if (isPlayerClimbing)
+        {
             Vector3 horizontal = axisDirection.x * transform.right;
 
             Vector3 vertical = axisDirection.y * transform.up;
@@ -159,10 +182,9 @@ public class PlayerMovement : MonoBehaviour
             movementDirection = horizontal + vertical;
 
             _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
-
-     }
-
+        }
     }
+
 
     private void Jump()
     {
@@ -236,6 +258,11 @@ public class PlayerMovement : MonoBehaviour
 
             _speed = _climbSpeed;
 
+            // panggil SetFPS dari class CameraManager
+
+            _cameraManager.SetFPSClampedCamera(true, transform.rotation.eulerAngles);
+
+
         }
     }
     
@@ -251,6 +278,8 @@ public class PlayerMovement : MonoBehaviour
             _speed = _walkSpeed;
 
             transform.position -= transform.forward;
+
+            _cameraManager.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
 
         }
     }
@@ -395,3 +424,48 @@ public class PlayerMovement : MonoBehaviour
 //        }
 //    }
 
+// buat method Move untuk gerakin player
+// method Move akan menerima data dari Class InputManager
+// jadi sediakan parameter dengan tipe Vector2 , namanya axisDirection
+
+////    private void Move(Vector2 axisDirection) // method Move with isPlayerClimbing checking  // lalu ditambah _cameraTransform.eulerAngles.y ke rotationAngle
+//    {
+// buat 2 variabel untuk check lagi berdiri atau lagi manjat 
+//        bool isPlayerStanding = _playerStance == PlayerStance.Stand;
+//        bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
+
+//        Vector3 movementDirection = Vector3.zero;
+
+
+// lalu cek dulu lagi berdiri atau lagi manjat
+
+//     if (isPlayerStanding)
+//     {
+//            if (axisDirection.magnitude >= 0.1) 
+//            {
+//                float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+
+//                float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
+
+//                transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
+
+//                movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
+
+//                _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+
+
+//            }
+
+//     }
+//     else if (isPlayerClimbing)
+//     {
+//            Vector3 horizontal = axisDirection.x * transform.right;
+
+//            Vector3 vertical = axisDirection.y * transform.up;
+
+//            movementDirection = horizontal + vertical;
+
+//            _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+
+//     }
+// }
