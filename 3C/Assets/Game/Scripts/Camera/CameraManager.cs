@@ -63,5 +63,9 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+    public void setTPSFieldofView(float fieldOfView)
+    {
+        _tpsCamera.m_Lens.FieldOfView = fieldOfView;
+    }
 
 }

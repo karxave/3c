@@ -262,7 +262,9 @@ public class PlayerMovement : MonoBehaviour
 
             _cameraManager.SetFPSClampedCamera(true, transform.rotation.eulerAngles);
 
+            // atur Field Of View menjadi 70 ketika memanjat
 
+            _cameraManager.setTPSFieldofView(70);
         }
     }
     
@@ -280,6 +282,8 @@ public class PlayerMovement : MonoBehaviour
             transform.position -= transform.forward;
 
             _cameraManager.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
+
+            _cameraManager.setTPSFieldofView(40);
 
         }
     }
