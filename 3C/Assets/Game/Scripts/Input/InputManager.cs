@@ -17,6 +17,7 @@ public class InputManager : MonoBehaviour
 
     public Action OnChangePOV;
 
+    public Action OnCrouchInput;
     private void Update()
     {
         CheckJumpInput();
@@ -120,8 +121,8 @@ public class InputManager : MonoBehaviour
                                       Input.GetKeyDown(KeyCode.RightControl);
     
         if (isPressCrouchInput)
-        { 
-            Debug.Log("Crouch"); 
+        {
+            OnCrouchInput();
         }
     }
 

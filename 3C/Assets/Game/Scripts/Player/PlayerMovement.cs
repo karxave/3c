@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
     private float _speed;   // current speed , akan dipakai untuk disesuaikan dengan _walkSpeed atau _sprintSpeed
 
     [SerializeField]
+    private float _crouchSpeed;
+
+    [SerializeField]
     private float _walkSprintTransition;
 
 
@@ -75,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Animator _animator;
 
-
+    private CapsuleCollider _colliderPlayer;
 
     private void Awake()
     {
@@ -87,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
 
         _animator = GetComponent<Animator>();
 
+        _colliderPlayer = GetComponent<CapsuleCollider>();
     }
 
 
@@ -103,6 +107,8 @@ public class PlayerMovement : MonoBehaviour
         _input.OnCancelClimb += CancelClimb;
 
         _cameraManager.OnChangePerspective += ChangePerspective;
+
+        _input.OnCrouchInput += Crouch;
     }
 
 
@@ -120,6 +126,8 @@ public class PlayerMovement : MonoBehaviour
         _input.OnCancelClimb -= CancelClimb;
 
         _cameraManager.OnChangePerspective -= ChangePerspective;
+
+        _input.OnCrouchInput -= Crouch;
     }
 
     private void Update()
@@ -128,23 +136,18 @@ public class PlayerMovement : MonoBehaviour
         CheckStep();
     }
 
-    private void Move(Vector2 axisDirection)   // sekarang buat camera , bikin dulu field _cameraManager utk direferensikan di Inspector
+    private void Move(Vector2 axisDirection)   // sekarang buat urusan Crouch
 
     {  
         Vector3 movementDirection = Vector3.zero;
         
         bool isPlayerStanding = _playerStance == PlayerStance.Stand;
         bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
-
+        bool isPlayerCrouch = _playerStance == PlayerStance.Crouch;
                    
-        if (isPlayerStanding)
+        if (isPlayerStanding || isPlayerCrouch)
         {
-            
-      
-
-            // tentukan terlebih dahulu apakah camera 1st person atau 3rd person
-            // pake switch
-            
+             
             switch(_cameraManager.CameraState)
             {
                 case CameraState.ThirdPerson:
@@ -315,6 +318,30 @@ public class PlayerMovement : MonoBehaviour
     private void ChangePerspective()
     {
         _animator.SetTrigger("ChangePerspective");
+    }
+
+    private void Crouch()
+    {
+        if (_playerStance == PlayerStance.Stand)
+        {
+            _playerStance = PlayerStance.Crouch;
+            _animator.SetBool("IsCrouch", true);
+           // atur collider supaya bisa masuk tunnel
+            _colliderPlayer.height = 1.3f;
+            _colliderPlayer.center = Vector3.up * 0.66f;
+            
+            _speed = _crouchSpeed;
+        }
+        else if (_playerStance == PlayerStance.Crouch)
+        {
+            _playerStance = PlayerStance.Stand;
+            _animator.SetBool("IsCrouch", false);
+            // kembalikan collider ke ukuran semula
+            _colliderPlayer.height = 1.8f;
+            _colliderPlayer.center = Vector3.up * 0.9f;
+            
+            _speed = _walkSpeed;
+        }
     }
 
     private void OnDrawGizmosSelected()
@@ -506,3 +533,80 @@ public class PlayerMovement : MonoBehaviour
 // atur animasi Third person movement only
 //   Vector3 velocity = new Vector3(_rigidBody.velocity.x, 0, _rigidBody.velocity.z);
 //   _animator.SetFloat("Velocity", velocity.magnitude * axisDirection.magnitude);
+
+//private void Move(Vector2 axisDirection)   // sekarang buat camera , bikin dulu field _cameraManager utk direferensikan di Inspector
+
+//{
+//    Vector3 movementDirection = Vector3.zero;
+
+//    bool isPlayerStanding = _playerStance == PlayerStance.Stand;
+//    bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
+
+
+//    if (isPlayerStanding)
+//    {
+
+
+
+//        // tentukan terlebih dahulu apakah camera 1st person atau 3rd person
+//        // pake switch
+
+//        switch (_cameraManager.CameraState)
+//        {
+//            case CameraState.ThirdPerson:
+
+//                if (axisDirection.magnitude >= 0.1)
+//                {
+//                    float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+
+//                    float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
+
+//                    transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
+
+//                    movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
+
+//                    _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+//                }
+
+//                break;
+
+//            case CameraState.FirstPerson:
+
+//                transform.rotation = Quaternion.Euler(0f, _cameraTransform.eulerAngles.y, 0f);
+
+//                Vector3 verticalDirection = axisDirection.y * transform.forward;
+
+//                Vector3 horizontalDirection = axisDirection.x * transform.right;
+
+//                movementDirection = verticalDirection + horizontalDirection;
+
+//                _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+
+//                break;
+
+//            default:
+//                break;
+
+//        }
+
+//        // atur animasi idle walking run untuk 3rd person and 1st person 
+//        Vector3 velocity = new Vector3(_rigidBody.velocity.x, 0, _rigidBody.velocity.z);
+
+//        _animator.SetFloat("Velocity", velocity.magnitude * axisDirection.magnitude); //3rd person pake parameter Velocity
+//        _animator.SetFloat("VelocityZ", velocity.magnitude * axisDirection.y); // 1st person pake parameter VelocityZ ke sumbu Z untuk sumbu y
+//        _animator.SetFloat("VelocityX", velocity.magnitude * axisDirection.x); // 1st person pake parameter VelocityX ke sumbu X untuk sumbu x
+
+
+
+//    }
+//    else if (isPlayerClimbing)
+//    {
+//        Vector3 horizontal = axisDirection.x * transform.right;
+
+//        Vector3 vertical = axisDirection.y * transform.up;
+
+//        movementDirection = horizontal + vertical;
+
+//        _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+//    }
+//}
