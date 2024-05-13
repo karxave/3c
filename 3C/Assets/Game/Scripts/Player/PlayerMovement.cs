@@ -213,12 +213,16 @@ public class PlayerMovement : MonoBehaviour
             Vector3 jumpDirection = Vector3.up; // new Vector3(0,1,0) = Vector3.up
 
             _rigidBody.AddForce(jumpDirection * _jumpForce * Time.deltaTime);
+
+            _animator.SetTrigger("Jump");
         }
     }
     
     private void CheckIsGrounded()
     {
         _isGrounded = Physics.CheckSphere(_groundDetector.position, _detectorRadius, _groundLayer);
+
+        _animator.SetBool("IsGrounded", _isGrounded);
     }
 
     private void CheckStep()
