@@ -80,6 +80,8 @@ public class PlayerMovement : MonoBehaviour
 
     private CapsuleCollider _colliderPlayer;
 
+
+
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();   // akses RigidBody via script di objek yang sama yaitu Player
@@ -205,6 +207,16 @@ public class PlayerMovement : MonoBehaviour
             movementDirection = horizontal + vertical;
 
             _rigidBody.AddForce(movementDirection * _speed * Time.deltaTime);
+
+            _rigidBody.AddForce(movementDirection * Time.deltaTime * _climbSpeed);
+
+            //next code for animation climbing movement
+
+            Vector3 velocity = new Vector3(_rigidBody.velocity.x, _rigidBody.velocity.y, 0);
+
+            _animator.SetFloat("ClimbVelocityX", velocity.magnitude * axisDirection.x);
+            _animator.SetFloat("ClimbVelocityY", velocity.magnitude * axisDirection.y);
+
         }
     }
 
@@ -275,6 +287,9 @@ public class PlayerMovement : MonoBehaviour
 
         if ( isInfrontofClimbingWall && _isGrounded && isNotClimbing)
         {
+            _colliderPlayer.center = Vector3.up * 1.3f; // kenapa di kali (0,1,0) ? karena yg mau diatur gerakan ke atas, nilai collidercenter awalnya 0.9f berubah jadi = 1 x 1.3 = 1.3f 
+
+
             Vector3 offset = (transform.forward * _climbOffset.z) + (Vector3.up * _climbOffset.y);
 
             transform.position = hit.point - offset;
@@ -292,6 +307,8 @@ public class PlayerMovement : MonoBehaviour
             // atur Field Of View menjadi 70 ketika memanjat
 
             _cameraManager.setTPSFieldofView(70);
+
+            _animator.SetBool("IsClimbing", true);
         }
     }
     
@@ -300,6 +317,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_playerStance == PlayerStance.Climb)
         {
+            _colliderPlayer.center = Vector3.up * 0.9f; // kembalikan nilai collider center menjadi 0.9f
+
             _playerStance = PlayerStance.Stand;
 
             _rigidBody.useGravity = true;
@@ -311,6 +330,8 @@ public class PlayerMovement : MonoBehaviour
             _cameraManager.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
 
             _cameraManager.setTPSFieldofView(40);
+
+            _animator.SetBool("IsClimbing", false);
 
         }
     }
