@@ -1,8 +1,11 @@
 using Cinemachine;
 using UnityEngine;
+using System;
 
 public class CameraManager : MonoBehaviour
 {
+    public Action OnChangePerspective;
+
     [SerializeField]
     public CameraState CameraState;
 
@@ -49,6 +52,8 @@ public class CameraManager : MonoBehaviour
 
     private void SwitchCamera()
     {
+        OnChangePerspective();
+
         if (CameraState == CameraState.ThirdPerson)
         {
             CameraState = CameraState.FirstPerson;

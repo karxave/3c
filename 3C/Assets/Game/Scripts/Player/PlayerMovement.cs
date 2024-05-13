@@ -73,6 +73,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private CameraManager _cameraManager;
 
+    private Animator _animator;
+
 
 
     private void Awake()
@@ -82,6 +84,8 @@ public class PlayerMovement : MonoBehaviour
         _speed = _walkSpeed;        // speed awal saat start Game
 
         _playerStance = PlayerStance.Stand;
+
+        _animator = GetComponent<Animator>();
 
     }
 
@@ -97,6 +101,8 @@ public class PlayerMovement : MonoBehaviour
         _input.OnClimbInput += StartClimb;
 
         _input.OnCancelClimb += CancelClimb;
+
+        _cameraManager.OnChangePerspective += ChangePerspective;
     }
 
 
@@ -112,6 +118,8 @@ public class PlayerMovement : MonoBehaviour
         _input.OnClimbInput -= StartClimb;
 
         _input.OnCancelClimb -= CancelClimb;
+
+        _cameraManager.OnChangePerspective -= ChangePerspective;
     }
 
     private void Update()
@@ -122,17 +130,21 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move(Vector2 axisDirection)   // sekarang buat camera , bikin dulu field _cameraManager utk direferensikan di Inspector
 
-    {
+    {  
+        Vector3 movementDirection = Vector3.zero;
+        
         bool isPlayerStanding = _playerStance == PlayerStance.Stand;
         bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
 
-        Vector3 movementDirection = Vector3.zero;
                    
         if (isPlayerStanding)
         {
+            
+      
+
             // tentukan terlebih dahulu apakah camera 1st person atau 3rd person
             // pake switch
-
+            
             switch(_cameraManager.CameraState)
             {
                 case CameraState.ThirdPerson:
@@ -171,7 +183,15 @@ public class PlayerMovement : MonoBehaviour
 
             }
 
-            
+            // atur animasi idle walking run untuk 3rd person and 1st person 
+            Vector3 velocity = new Vector3(_rigidBody.velocity.x, 0, _rigidBody.velocity.z);
+
+            _animator.SetFloat("Velocity", velocity.magnitude * axisDirection.magnitude); //3rd person pake parameter Velocity
+            _animator.SetFloat("VelocityZ", velocity.magnitude * axisDirection.y); // 1st person pake parameter VelocityZ ke sumbu Z untuk sumbu y
+            _animator.SetFloat("VelocityX", velocity.magnitude * axisDirection.x); // 1st person pake parameter VelocityX ke sumbu X untuk sumbu x
+
+
+
         }
         else if (isPlayerClimbing)
         {
@@ -286,6 +306,11 @@ public class PlayerMovement : MonoBehaviour
             _cameraManager.setTPSFieldofView(40);
 
         }
+    }
+
+    private void ChangePerspective()
+    {
+        _animator.SetTrigger("ChangePerspective");
     }
 
     private void OnDrawGizmosSelected()
@@ -473,3 +498,7 @@ public class PlayerMovement : MonoBehaviour
 
 //     }
 // }
+
+// atur animasi Third person movement only
+//   Vector3 velocity = new Vector3(_rigidBody.velocity.x, 0, _rigidBody.velocity.z);
+//   _animator.SetFloat("Velocity", velocity.magnitude * axisDirection.magnitude);
