@@ -2668,6 +2668,11 @@ MonoBehaviour:
   _climbSpeed: 20
   _cameraTransform: {fileID: 330585546}
   _cameraManager: {fileID: 1637113432}
+  _glideSpeed: 70
+  _airDrag: 5
+  _glideRotationSpeed: {x: 20, y: 40, z: 20}
+  _minGlideRotationX: -10
+  _maxGlideRotationX: 14
 --- !u!136 &919132148681894545
 CapsuleCollider:
   m_ObjectHideFlags: 0

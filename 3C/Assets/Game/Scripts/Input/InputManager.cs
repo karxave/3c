@@ -18,6 +18,12 @@ public class InputManager : MonoBehaviour
     public Action OnChangePOV;
 
     public Action OnCrouchInput;
+
+    public Action OnGlideInput;
+
+    public Action OnCancelGlide;
+
+
     private void Update()
     {
         CheckJumpInput();
@@ -80,6 +86,10 @@ public class InputManager : MonoBehaviour
                     OnCancelClimb();
                 }
             }
+           if (OnCancelGlide != null)
+            {
+                OnCancelGlide();
+            }
         }
     }
 
@@ -89,7 +99,11 @@ public class InputManager : MonoBehaviour
 
         if (isPressGlideInput)
         {
-            Debug.Log("Glide");
+            if (OnGlideInput != null)
+            {
+                OnGlideInput();
+            }
+            
         }
     }
 
@@ -99,7 +113,11 @@ public class InputManager : MonoBehaviour
 
         if (isPressClimbInput)
         {
-            OnClimbInput();
+            if (OnClimbInput != null)
+            {
+                OnClimbInput();
+            }
+            
         }
     }
 
