@@ -25,6 +25,8 @@ public class InputManager : MonoBehaviour
 
     public Action OnPunchInput;
 
+    public Action OnMainMenuInput;
+
 
     private void Update()
     {
@@ -63,7 +65,12 @@ public class InputManager : MonoBehaviour
         
         if (isPressMainMenuInput)
         {
-            Debug.Log("Back to Main Menu");
+            if (OnMainMenuInput != null)
+            {
+                OnMainMenuInput();
+            }
+
+            
         }
     }
 
@@ -73,7 +80,11 @@ public class InputManager : MonoBehaviour
         {
             if (isPressPunchInput)
             {
-                OnPunchInput();
+                if (OnPunchInput != null)
+                {
+                    OnPunchInput();
+                }    
+               
             }
             
         }
@@ -146,7 +157,11 @@ public class InputManager : MonoBehaviour
     
         if (isPressCrouchInput)
         {
-            OnCrouchInput();
+            if (OnCrouchInput != null)
+            {
+                OnCrouchInput();
+            }
+            
         }
     }
 
