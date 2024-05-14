@@ -105,6 +105,15 @@ public class PlayerMovement : MonoBehaviour
 
     private Coroutine _resetCombo;
 
+    [SerializeField]
+    private Transform _hitDetector;
+
+    [SerializeField]
+    private float _hitDetectorRadius;
+
+    [SerializeField]
+    private LayerMask _hitLayer;
+
 
     private void Awake()
     {
@@ -117,6 +126,8 @@ public class PlayerMovement : MonoBehaviour
         _animator = GetComponent<Animator>();
 
         _colliderPlayer = GetComponent<CapsuleCollider>();
+
+        HideAndLockCursor();
     }
 
 
@@ -174,6 +185,12 @@ public class PlayerMovement : MonoBehaviour
         CheckIsGrounded();
         CheckStep();
         Glide();
+    }
+
+    private void HideAndLockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Move(Vector2 axisDirection)   // sekarang buat urusan Crouch
@@ -494,6 +511,19 @@ public class PlayerMovement : MonoBehaviour
         _combo = 0;
     }
 
+    private void Hit()
+    {
+        // Overlapshere buat cari tahu object mana aja yang kedetek dan disimpen ke array tipe Collider 
+        Collider[] hitObjects = Physics.OverlapSphere(_hitDetector.position, _hitDetectorRadius, _hitLayer);
+
+        for (int i = 0; i < hitObjects.Length; i++)
+        {
+            if (hitObjects[i].gameObject != null)
+            {
+                Destroy(hitObjects[i].gameObject); 
+            }
+        }    
+    }
 
 
     private void OnDrawGizmosSelected()
