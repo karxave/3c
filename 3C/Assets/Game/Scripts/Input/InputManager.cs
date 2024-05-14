@@ -23,6 +23,8 @@ public class InputManager : MonoBehaviour
 
     public Action OnCancelGlide;
 
+    public Action OnPunchInput;
+
 
     private void Update()
     {
@@ -69,7 +71,11 @@ public class InputManager : MonoBehaviour
     {
         bool isPressPunchInput = Input.GetKeyDown(KeyCode.Mouse0);
         {
-            Debug.Log("Punch");
+            if (isPressPunchInput)
+            {
+                OnPunchInput();
+            }
+            
         }
     }
 

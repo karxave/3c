@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -95,6 +96,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float _maxGlideRotationX;
 
+    private bool _isPunching;
+
+    private int _combo = 0;
+    
+    [SerializeField]
+    private float _resetComboInterval;
+
+    private Coroutine _resetCombo;
+
 
     private void Awake()
     {
@@ -129,6 +139,9 @@ public class PlayerMovement : MonoBehaviour
         _input.OnGlideInput += StartGlide;
 
         _input.OnCancelGlide += CancelGlide;
+
+        _input.OnPunchInput += Punch;
+
     }
 
 
@@ -152,6 +165,8 @@ public class PlayerMovement : MonoBehaviour
         _input.OnGlideInput -= StartGlide;
 
         _input.OnCancelGlide -= CancelGlide;
+
+        _input.OnPunchInput -= Punch;
     }
 
     private void Update()
@@ -171,7 +186,7 @@ public class PlayerMovement : MonoBehaviour
         bool isPlayerCrouch = _playerStance == PlayerStance.Crouch;
         bool isPlayerGliding = _playerStance == PlayerStance.Glide;
                    
-        if (isPlayerStanding || isPlayerCrouch)
+        if (isPlayerStanding || isPlayerCrouch && !_isPunching)
         {
              
             switch(_cameraManager.CameraState)
@@ -442,6 +457,44 @@ public class PlayerMovement : MonoBehaviour
             _cameraManager.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
         }
     }
+
+    private void Punch()
+    {
+        if (!_isPunching && _playerStance == PlayerStance.Stand)
+        {
+            _isPunching = true;
+            if (_combo < 3)
+            {
+                _combo = _combo + 1;
+            }
+            else
+            {
+                _combo = 1;
+            }
+            _animator.SetInteger("Combo", _combo);
+            _animator.SetTrigger("Punch");
+        }
+    }
+
+    private void EndPunch()
+    {
+        _isPunching = false;
+
+        if (_resetCombo != null)
+        {
+            StopCoroutine(_resetCombo);
+        }
+        
+        _resetCombo = StartCoroutine(ResetCombo());
+    }
+
+    private IEnumerator ResetCombo()
+    {
+        yield return new WaitForSeconds(_resetComboInterval);
+        _combo = 0;
+    }
+
+
 
     private void OnDrawGizmosSelected()
     {
