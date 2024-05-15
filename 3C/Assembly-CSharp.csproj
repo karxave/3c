@@ -65,6 +65,7 @@
     <Compile Include="Assets\Game\Scripts\Camera\CameraState.cs" />
     <Compile Include="Assets\Game\Scripts\MainMenu\MainMenuManager.cs" />
     <Compile Include="Assets\Game\Scripts\Player\PlayerMovement.cs" />
+    <Compile Include="Assets\Game\Scripts\Player\PlayerAudioManager.cs" />
     <Compile Include="Assets\Game\Scripts\Input\InputManager.cs" />
     <Compile Include="Assets\Config\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Game\Scripts\Camera\CameraManager.cs" />

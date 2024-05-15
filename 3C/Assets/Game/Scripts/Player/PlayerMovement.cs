@@ -114,6 +114,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private LayerMask _hitLayer;
 
+    [SerializeField]
+    private PlayerAudioManager _playerAudioManager;
+
 
     private void Awake()
     {
@@ -286,6 +289,8 @@ public class PlayerMovement : MonoBehaviour
             rotationDegree.y += _glideRotationSpeed.y * axisDirection.x * Time.deltaTime;
 
             transform.rotation = Quaternion.Euler(rotationDegree); // pake Quaternion.Euler buat rubah nilai rotasi menjadi Vector3
+
+
         }
     }
 
@@ -461,6 +466,8 @@ public class PlayerMovement : MonoBehaviour
 
             // batasi rotasi camera untukcamera 1stperson
             _cameraManager.SetFPSClampedCamera(true,transform.rotation.eulerAngles);
+
+            _playerAudioManager.PlayGlideSfx();
         }
     }
 
@@ -472,6 +479,8 @@ public class PlayerMovement : MonoBehaviour
             _animator.SetBool("IsGliding", false);
 
             _cameraManager.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
+
+            _playerAudioManager.StopGlideSfx();
         }
     }
 
