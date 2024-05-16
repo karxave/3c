@@ -271,10 +271,11 @@ public class PlayerMovement : MonoBehaviour
 
             //next code for animation climbing movement
 
-            Vector3 velocity = new Vector3(_rigidBody.velocity.x, _rigidBody.velocity.y, 0);
+//            Vector3 velocity = new Vector3(_rigidBody.velocity.x, _rigidBody.velocity.y, 0);
 
-            _animator.SetFloat("ClimbVelocityX", velocity.magnitude * axisDirection.x);
-            _animator.SetFloat("ClimbVelocityY", velocity.magnitude * axisDirection.y);
+
+            _animator.SetFloat("ClimbVelocityX", _rigidBody.velocity.magnitude * axisDirection.x);
+            _animator.SetFloat("ClimbVelocityY", _rigidBody.velocity.magnitude * axisDirection.y);
         }
 
         else if(isPlayerGliding)
